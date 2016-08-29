@@ -93,17 +93,20 @@ function generate() {
       moistureBuffer32[i] = (255 * moisture|0) << 24;
       buffer32[i] = biome(elevation, moisture);
 
-      geometry.vertices[i].z = elevation * 400;
+      geometry.vertices[i].z = elevation * 800;
     }
   }
-
-  const plane = new THREE.Mesh(geometry, wireframeMaterial);
-  scene.add(plane);
 
   elevationCtx.putImageData(elevationImageData, 0, 0);
   moistureCtx.putImageData(moistureImageData, 0, 0);
   biomeCtx.putImageData(imageData, 0, 0);
 
+  const plane = new THREE.Mesh(geometry, wireframeMaterial);
+
+  // Y up!
+  plane.rotation.x = Math.PI * 1.5;
+
+  scene.add(plane);
   render3d();
 }
 
@@ -130,8 +133,8 @@ function initThree() {
   const axes = new THREE.AxisHelper(100);
   scene.add(axes);
 
-  camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-  camera.position.set(20, -80, 100);
+  camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100000);
+  camera.position.set(width * 4, width * 4, width * 4);
 
   controls = new TrackballControls(camera);
 
@@ -141,8 +144,6 @@ function initThree() {
 
   renderer.setSize(width, height);
   renderer.setClearColor( 0xeeeeee );
-
-  // document.body.appendChild(renderer.domElement);
 }
 
 function init() {
