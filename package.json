@@ -1,0 +1,26 @@
+{
+  "name": "terrapin",
+  "version": "1.0.0",
+  "description": "Procedural map generation in JavaScript",
+  "main": "index.js",
+  "scripts": {
+    "start": "budo index.js:bundle.js --live"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jwhitfieldseed/terrapin.git"
+  },
+  "author": "Joe Whitfield-Seed <joeseed86@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jwhitfieldseed/terrapin/issues"
+  },
+  "homepage": "https://github.com/jwhitfieldseed/terrapin#readme",
+  "dependencies": {
+    "browserify": "^13.1.0",
+    "budo": "^9.0.0",
+    "noisejs": "^2.1.0",
+    "simplex-noise": "^2.2.0",
+    "three": "^0.80.1"
+  }
+}
