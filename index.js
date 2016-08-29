@@ -1,6 +1,7 @@
 const THREE = require("three");
 const TrackballControls = require('three-trackballcontrols')
-const { Noise } = require("noisejs");
+// const { Noise } = require("noisejs");
+const SimplexNoise = require("simplex-noise");
 
 const width = 512;
 const height = width;
@@ -20,16 +21,19 @@ const wireframeMaterial = new THREE.MeshPhongMaterial({
 });
 
 function randomSeed() {
-  Noise1 = new Noise(Math.random());
-  Noise2 = new Noise(Math.random());
+  // Noise1 = new Noise(Math.random());
+  // Noise2 = new Noise(Math.random());
+
+  Noise1 = new SimplexNoise();
+  Noise2 = new SimplexNoise();
 }
 
 function noise1 (nx, ny) {
-  return Noise1.simplex2(nx, ny) / 2 + 0.5;
+  return Noise1.noise2D(nx, ny) / 2 + 0.5;
 }
 
 function noise2 (nx, ny) {
-  return Noise2.simplex2(nx, ny) / 2 + 0.5;
+  return Noise2.noise2D(nx, ny) / 2 + 0.5;
 }
 
 function getElevation(nx, ny) {
@@ -45,6 +49,8 @@ function getElevation(nx, ny) {
   e /= (1.00+0.50+0.25+0.13+0.06+0.03);
 
   // push small/mid values down to create valleys
+  // TODO this is pushing peaks too far down; maybe apply
+  //  only below a threshold?
   return Math.pow(e, 2.3);
 }
 
@@ -84,6 +90,9 @@ function generate() {
   // 3d elevation
   const geometry = new THREE.PlaneGeometry(width * 4, width * 4, width - 1, height -1);
 
+  let eMin = Infinity;
+  let eMax = -Infinity;
+
   for(let y = 0; y < height; y ++) {
     for (let x = 0; x < width; x ++) {
       const i = y * height + x;
@@ -94,6 +103,9 @@ function generate() {
       const elevation = getElevation(nx, ny);
       const moisture = getMoisture(nx, ny);
 
+      if (elevation < eMin) eMin = elevation;
+      if (elevation > eMax) eMax = elevation;
+
       elevationBuffer32[i] = (255 * elevation|0) << 24;
       moistureBuffer32[i] = hex(0x44447a, (255 * moisture | 0));
       buffer32[i] = biome(elevation, moisture);
@@ -102,6 +114,8 @@ function generate() {
     }
   }
 
+  console.log("Min/Max elevation", eMin, eMax);
+
   elevationCtx.putImageData(elevationImageData, 0, 0);
   moistureCtx.putImageData(moistureImageData, 0, 0);
   biomeCtx.putImageData(imageData, 0, 0);
@@ -109,7 +123,8 @@ function generate() {
   const biomeTexture = new THREE.Texture(biomeCanvas);
   biomeTexture.needsUpdate = true;
   const biomeMaterial = new THREE.MeshLambertMaterial({
-    map: biomeTexture
+    map: biomeTexture,
+    side: THREE.DoubleSide
   });
 
   // const material = wireframeMaterial;
