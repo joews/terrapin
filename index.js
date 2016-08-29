@@ -101,7 +101,16 @@ function generate() {
   moistureCtx.putImageData(moistureImageData, 0, 0);
   biomeCtx.putImageData(imageData, 0, 0);
 
-  const plane = new THREE.Mesh(geometry, wireframeMaterial);
+  const biomeTexture = new THREE.Texture(biomeCanvas);
+  biomeTexture.needsUpdate = true;
+  const biomeMaterial = new THREE.MeshLambertMaterial({
+    map: biomeTexture
+  });
+
+  // const material = wireframeMaterial;
+  const material = biomeMaterial;
+
+  const plane = new THREE.Mesh(geometry, material);
 
   // Y up!
   plane.rotation.x = Math.PI * 1.5;
@@ -134,7 +143,7 @@ function initThree() {
   scene.add(axes);
 
   camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100000);
-  camera.position.set(width * 4, width * 4, width * 4);
+  camera.position.set(0, width * 4, width * 4);
 
   controls = new TrackballControls(camera);
 
@@ -144,6 +153,13 @@ function initThree() {
 
   renderer.setSize(width, height);
   renderer.setClearColor( 0xeeeeee );
+
+  const ambientLight = new THREE.AmbientLight(0xE4D2AF, 0.3);
+  scene.add(ambientLight);
+
+  const pointLight = new THREE.PointLight(0xFFFFFF);
+  pointLight.position.set(width * 4, width * 4, width * 4);
+  scene.add(pointLight);
 }
 
 function init() {
