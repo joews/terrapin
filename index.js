@@ -1,4 +1,5 @@
 const THREE = require("three");
+const TrackballControls = require('three-trackballcontrols')
 const { Noise } = require("noisejs");
 
 const width = 400;
@@ -6,6 +7,17 @@ const height = width;
 
 let Noise1;
 let Noise2;
+
+let scene;
+let camera;
+let renderer;
+let controls;
+
+const wireframeMaterial = new THREE.MeshPhongMaterial({
+  // color: 0xdddddd,
+  color: 0x333333,
+  wireframe: true
+});
 
 function randomSeed() {
   Noise1 = new Noise(Math.random());
@@ -48,6 +60,7 @@ function generate() {
   const elevationCanvas = document.getElementById("elevation-canvas");
   const moistureCanvas = document.getElementById("moisture-canvas");
   const biomeCanvas = document.getElementById("biome-canvas");
+  const elevation3dCanvas = document.getElementById("elevation-3d-canvas");
 
   const elevationCtx = elevationCanvas.getContext("2d");
   const moistureCtx = moistureCanvas.getContext("2d");
@@ -63,6 +76,9 @@ function generate() {
   const moistureBuffer32 = new Uint32Array(moistureImageData.data.buffer);
   const buffer32 = new Uint32Array(imageData.data.buffer);
 
+  // 3d elevation
+  const geometry = new THREE.PlaneGeometry(width * 4, width * 4, width - 1, height -1);
+
   for(let y = 0; y < height; y ++) {
     for (let x = 0; x < width; x ++) {
       const i = y * height + x;
@@ -75,15 +91,20 @@ function generate() {
 
       elevationBuffer32[i] = (255 * elevation|0) << 24;
       moistureBuffer32[i] = (255 * moisture|0) << 24;
-
-
       buffer32[i] = biome(elevation, moisture);
+
+      geometry.vertices[i].z = elevation * 400;
     }
   }
+
+  const plane = new THREE.Mesh(geometry, wireframeMaterial);
+  scene.add(plane);
 
   elevationCtx.putImageData(elevationImageData, 0, 0);
   moistureCtx.putImageData(moistureImageData, 0, 0);
   biomeCtx.putImageData(imageData, 0, 0);
+
+  render3d();
 }
 
 // TODO more biomes, use moisture
@@ -103,6 +124,27 @@ function color(r, g, b, a = 0xFF) {
 const WATER = color(75, 75, 127);
 const LAND = color(100, 150, 85);
 
+function initThree() {
+  scene = new THREE.Scene();
+
+  const axes = new THREE.AxisHelper(100);
+  scene.add(axes);
+
+  camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  camera.position.set(20, -80, 100);
+
+  controls = new TrackballControls(camera);
+
+  renderer = new THREE.WebGLRenderer({
+    canvas: document.getElementById("elevation-3d-canvas")
+  });
+
+  renderer.setSize(width, height);
+  renderer.setClearColor( 0xeeeeee );
+
+  // document.body.appendChild(renderer.domElement);
+}
+
 function init() {
   const canvases = document.querySelectorAll("canvas");
   for (const c of canvases) {
@@ -110,8 +152,16 @@ function init() {
     c.height = height;
   }
 
+  initThree();
+
   randomSeed();
   generate();
+}
+
+function render3d() {
+  controls.update();
+  requestAnimationFrame(render3d);
+  renderer.render(scene, camera);
 }
 
 init();

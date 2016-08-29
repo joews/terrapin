@@ -21,6 +21,7 @@
     "budo": "^9.0.0",
     "noisejs": "^2.1.0",
     "simplex-noise": "^2.2.0",
-    "three": "^0.80.1"
+    "three": "^0.80.1",
+    "three-trackballcontrols": "0.0.5"
   }
 }
