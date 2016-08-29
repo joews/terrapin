@@ -3,6 +3,18 @@ const TrackballControls = require('three-trackballcontrols')
 // const { Noise } = require("noisejs");
 const SimplexNoise = require("simplex-noise");
 
+//
+// TODO
+// * debug elevation: why no really high mountains?
+// * refactor & modularise
+// * UI for picking render options (e.g seed, elevation wireframe, biomes, turn components on/off)
+// * FPS meter
+// * 3d render slices of very large map
+// * more variables - wind, erosion?
+// * Pin sea to 0!
+// * Island
+// * Quantize to hex
+
 const width = 512;
 const height = width;
 
@@ -224,7 +236,7 @@ function initThree() {
   scene.add(axes);
 
   camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100000);
-  camera.position.set(0, width * 4, width * 4);
+  camera.position.set(0, width * 5, width * 5);
 
   controls = new TrackballControls(camera);
 
@@ -235,11 +247,11 @@ function initThree() {
   renderer.setSize(width, height);
   renderer.setClearColor( 0x333333 );
 
-  const ambientLight = new THREE.AmbientLight(0xE4D2AF, 0.3);
+  const ambientLight = new THREE.AmbientLight(0xE4D2AF, 0.2);
   scene.add(ambientLight);
 
   const pointLight = new THREE.PointLight(0xFFFFFF);
-  pointLight.position.set(width * 4, width * 4, width * 4);
+  pointLight.position.set(width * 2, width * 2, width * 2);
   scene.add(pointLight);
 }
 
