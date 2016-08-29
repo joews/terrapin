@@ -44,8 +44,8 @@ function getElevation(nx, ny) {
 
   e /= (1.00+0.50+0.25+0.13+0.06+0.03);
 
-   // push small/mid values down to create valleys
-   return Math.pow(e, 2);
+  // push small/mid values down to create valleys
+  return Math.pow(e, 2.3);
 }
 
 function getMoisture(nx, ny) {
@@ -58,7 +58,7 @@ function getMoisture(nx, ny) {
    + 0.50 * noise2(32 * nx, 32 * ny));
   m /= (1.00+0.75+0.33+0.33+0.33+0.50);
 
-   return m
+  return m
 }
 
 function generate() {
@@ -95,7 +95,7 @@ function generate() {
       const moisture = getMoisture(nx, ny);
 
       elevationBuffer32[i] = (255 * elevation|0) << 24;
-      moistureBuffer32[i] = (255 * moisture|0) << 24;
+      moistureBuffer32[i] = hex(0x44447a, (255 * moisture | 0));
       buffer32[i] = biome(elevation, moisture);
 
       geometry.vertices[i].z = elevation * 800;
