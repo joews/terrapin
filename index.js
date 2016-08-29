@@ -2,7 +2,7 @@ const THREE = require("three");
 const TrackballControls = require('three-trackballcontrols')
 const { Noise } = require("noisejs");
 
-const width = 400;
+const width = 512;
 const height = width;
 
 let Noise1;
@@ -33,27 +33,32 @@ function noise2 (nx, ny) {
 }
 
 function getElevation(nx, ny) {
-   // combine several frequencies for different types of hill
-  e = 1 * noise1(1 * nx, 1 * ny)
-   + 0.5 * noise1(2 * nx, 2 * ny)
-   + 0.25 * noise1(4 * nx, 4 * ny);
+  // combine several frequencies for different types of hill
+  let e =
+      (1.00 * noise1( 1 * nx,  1 * ny)
+     + 0.50 * noise1( 2 * nx,  2 * ny)
+     + 0.25 * noise1( 4 * nx,  4 * ny)
+     + 0.13 * noise1( 8 * nx,  8 * ny)
+     + 0.06 * noise1(16 * nx, 16 * ny)
+     + 0.03 * noise1(32 * nx, 32 * ny));
 
-   e /= (1 + 0.5 + 0.25);
+  e /= (1.00+0.50+0.25+0.13+0.06+0.03);
 
    // push small/mid values down to create valleys
-   return Math.pow(e, 2.5);
+   return Math.pow(e, 2);
 }
 
 function getMoisture(nx, ny) {
-   // combine several frequencies
-   m = 1 * noise2(1 * nx, 1 * ny)
-   + 0.5 * noise2(2 * nx, 2 * ny)
-   + 0.25 * noise2(4 * nx, 4 * ny);
+  let m =
+    (1.00 * noise2( 1 * nx,  1 * ny)
+   + 0.75 * noise2( 2 * nx,  2 * ny)
+   + 0.33 * noise2( 4 * nx,  4 * ny)
+   + 0.33 * noise2( 8 * nx,  8 * ny)
+   + 0.33 * noise2(16 * nx, 16 * ny)
+   + 0.50 * noise2(32 * nx, 32 * ny));
+  m /= (1.00+0.75+0.33+0.33+0.33+0.50);
 
-   m /= (1 + 0.5 + 0.25);
-
-   // push small/mid values down to create valleys
-   return Math.pow(m, 2.5);
+   return m
 }
 
 function generate() {
